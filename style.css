@@ -1,0 +1,275 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+    position: relative; /* Needed to position the mute button */
+}
+
+main {
+    padding: 20px;
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.view {
+    margin-bottom: 20px;
+}
+
+h2, h3 {
+    color: #333;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#routine-list li {
+    background-color: #e9e9e9;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#routine-list li .routine-actions button {
+    margin-left: 10px;
+}
+
+button {
+    background-color: #5cb85c; /* Default Green for save/confirm */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #4cae4c;
+}
+
+/* Specific Button Colors */
+#player-end-workout-btn,
+#cancel-start-workout-btn,
+#editor-cancel-btn,
+.delete-routine-btn,
+.remove-exercise-btn {
+    background-color: #d9534f; /* Red for cancel/delete/remove */
+}
+#player-end-workout-btn:hover,
+#cancel-start-workout-btn:hover,
+#editor-cancel-btn:hover,
+.delete-routine-btn:hover,
+.remove-exercise-btn:hover {
+    background-color: #c9302c;
+}
+
+#create-new-routine-btn,
+.edit-routine-btn,
+#editor-add-exercise-btn {
+    background-color: #5bc0de; /* Blue/Teal for create/edit/add */
+}
+#create-new-routine-btn:hover,
+.edit-routine-btn:hover,
+#editor-add-exercise-btn:hover {
+    background-color: #46b8da;
+}
+
+.duplicate-routine-btn {
+    background-color: #f0ad4e; /* Orange/Yellow for duplicate */
+}
+.duplicate-routine-btn:hover {
+    background-color: #ec971f;
+}
+
+/* Mute button styles */
+.icon-btn {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    background: none;
+    border: 2px solid white;
+    color: white;
+    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    line-height: 40px; /* Center the emoji vertically */
+    text-align: center;
+}
+
+.icon-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+
+/* Workout Player Styles */
+#workout-player-view {
+    text-align: center;
+}
+
+#player-exercise-info {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+#player-exercise-info .notes {
+    font-style: italic;
+    color: #555;
+    font-size: 0.9em;
+}
+
+#player-timer-display {
+    font-size: 1.5em;
+    color: #d9534f;
+    margin-bottom: 20px;
+}
+#player-timer-display h3 {
+    margin-bottom: 5px;
+}
+#player-timer-value {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.player-controls button {
+    margin: 5px;
+    padding: 12px 20px;
+}
+
+/* Routine Editor Styles (Enhanced) */
+#routine-editor-view h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#routine-form .form-group {
+    margin-bottom: 15px;
+}
+
+#routine-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#routine-form input[type="text"],
+#routine-form input[type="number"],
+#routine-form textarea {
+    width: 100%; /* Use 100% width */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    box-sizing: border-box; /* Ensures padding and border don't add to width */
+}
+
+#routine-form textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+#routine-form .form-group-inline {
+    display: flex;
+    gap: 15px; /* Spacing between inline form groups */
+}
+
+#routine-form .form-group-inline .form-group {
+    flex: 1; /* Make inline groups share space equally */
+    min-width: 0; /* Important for flex items to shrink properly */
+}
+
+
+#editor-exercises-container .exercise-form-item {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+}
+
+#editor-exercises-container .exercise-form-item hr {
+    margin-top: 0;
+    margin-bottom: 15px;
+    border: 0;
+    border-top: 1px solid #ddd;
+}
+
+#editor-exercises-container .exercise-form-item h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+#editor-add-exercise-btn {
+    margin-bottom: 20px;
+}
+
+#routine-form .form-actions {
+    margin-top: 20px;
+    text-align: right;
+}
+
+#routine-form .form-actions button {
+    margin-left: 10px;
+}
+
+
+/* Modal Styles */
+.modal {
+  position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+  overflow: auto; background-color: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-content {
+  background-color: #fff; margin: auto; padding: 20px 30px;
+  border: 1px solid #888; width: 90%; max-width: 600px; border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.modal-content h2 { margin-top: 0; }
+.modal-content ul { margin-left: 20px; list-style-type: disc; }
+.modal-actions { margin-top: 25px; text-align: right; }
+.modal-actions button { margin-left: 10px; padding: 10px 15px;}
+
+
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    font-size: 0.9em;
+}
+
+/* Media Query for better mobile responsiveness */
+@media (max-width: 600px) {
+    #routine-form .form-group-inline {
+        flex-direction: column;
+        gap: 0; /* Remove gap if stacking */
+    }
+}
