@@ -9,133 +9,56 @@
 <body>
     <header>
         <h1>My Workout Routines</h1>
-        <button id="mute-btn" class="icon-btn">🔊</button>
+        <div class="header-nav">
+            <button id="history-btn" class="nav-btn">History</button>
+            <button id="home-btn" class="nav-btn" style="display: none;">Routines</button>
+            <button id="unit-toggle-btn" class="nav-btn">lbs</button>
+            <button id="dark-mode-btn" class="icon-btn">🌙</button>
+            <button id="mute-btn" class="icon-btn">🔊</button>
+        </div>
     </header>
 
     <main>
-        <!-- Routine List View -->
-        <section id="routine-list-view" class="view">
-            <h2>Available Routines</h2>
-            <ul id="routine-list">
-                <!-- Routines will be populated here by JS -->
-            </ul>
-            <button id="create-new-routine-btn">Create New Routine</button>
-        </section>
-
-        <!-- Workout Player View -->
-        <section id="workout-player-view" class="view" style="display: none;">
-            <h2 id="player-routine-name">Routine Name</h2>
-            <div id="player-exercise-info">
-                <h3 id="player-exercise-name">Exercise Name</h3>
-                <p>Set: <span id="player-current-set">1</span> of <span id="player-total-sets">2</span></p>
-                <p>Reps: <span id="player-reps-target">10-15</span></p>
-                <p id="player-exercise-notes" class="notes">Notes for exercise.</p>
-            </div>
-            <div id="player-timer-display" style="display: none;">
-                <h3>RESTING</h3>
-                <p id="player-timer-value">00:00</p>
-            </div>
-            <div class="player-controls">
-                <button id="player-set-action-btn">Mark Set Complete</button>
-                <button id="player-next-exercise-btn" style="display: none;">Next Exercise</button>
-                <button id="player-end-workout-btn">End Workout</button>
-            </div>
-        </section>
-
-        <!-- Routine Editor View (Enhanced) -->
-        <section id="routine-editor-view" class="view" style="display: none;">
-            <h2 id="editor-view-title">Create/Edit Routine</h2>
-            <form id="routine-form">
-                <input type="hidden" id="editor-routine-id"> <!-- For editing existing routines -->
-
-                <div class="form-group">
-                    <label for="editor-routine-name-input">Routine Name:</label>
-                    <input type="text" id="editor-routine-name-input" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="editor-routine-description-input">Description:</label>
-                    <textarea id="editor-routine-description-input"></textarea>
-                </div>
-
-                <h3>Exercises:</h3>
-                <div id="editor-exercises-container">
-                    <!-- Exercise forms will be dynamically added here -->
-                </div>
-
-                <button type="button" id="editor-add-exercise-btn">Add Exercise</button>
-
-                <div class="form-actions">
-                    <button type="submit" id="editor-save-routine-btn">Save Routine</button>
-                    <button type="button" id="editor-cancel-btn">Cancel</button>
-                </div>
-            </form>
-        </section>
-
-        <!-- Template for a single exercise form item (will be cloned by JS) -->
-        <template id="exercise-form-template">
-            <div class="exercise-form-item">
-                <hr>
-                <h4>Exercise <span class="exercise-number">1</span></h4>
-                <div class="form-group">
-                    <label>Exercise Name:</label>
-                    <input type="text" class="exercise-name-input" required>
-                </div>
-                <div class="form-group-inline">
-                    <div class="form-group">
-                        <label>Sets:</label>
-                        <input type="number" class="exercise-sets-input" min="1" value="2" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Reps:</label>
-                        <input type="text" class="exercise-reps-input" placeholder="e.g., 10-15 or AMRAP" value="10-15" required>
-                    </div>
-                </div>
-                <div class="form-group-inline">
-                    <div class="form-group">
-                        <label>Rest Between Sets (sec):</label>
-                        <input type="number" class="exercise-rest-between-sets-input" min="0" value="75" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Rest After Exercise (sec):</label>
-                        <input type="number" class="exercise-rest-after-exercise-input" min="0" value="105" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Notes (Optional):</label>
-                    <textarea class="exercise-notes-input"></textarea>
-                </div>
-                <button type="button" class="remove-exercise-btn">Remove This Exercise</button>
-            </div>
-        </template>
+        <section id="routine-list-view" class="view"></section>
+        <section id="workout-player-view" class="view" style="display: none;"></section>
+        <section id="routine-editor-view" class="view" style="display: none;"></section>
+        <section id="history-list-view" class="view" style="display: none;"></section>
+        <section id="log-detail-view" class="view" style="display: none;"></section>
     </main>
 
-    <!-- Warm-up Reminder Modal -->
+    <!-- Warm-up Modal -->
     <div id="warmup-reminder-modal" class="modal" style="display:none;">
-      <div class="modal-content">
-        <h2>Ready to Go? Warm-up Check!</h2>
-        <p>Just a friendly reminder to make sure you're properly warmed up before starting your main sets.</p>
-        <p>Consider including:</p>
-        <ul>
-          <li>5-10 minutes of light cardio (e.g., brisk walk, cycling, jumping jacks)</li>
-          <li>Dynamic stretches for the muscles you'll be working (e.g., arm circles, leg swings, torso twists)</li>
-          <li>A few very light "feeler" sets for your first exercise.</li>
-        </ul>
-        <p><em>This app will guide you through your main working sets.</em></p>
+        <div class="modal-content">
+          <h2>Ready to Go? Warm-up Check!</h2>
+          <p>A proper warm-up is crucial for a great and safe workout. Have you warmed up?</p>
+          <div class="modal-actions">
+            <button id="confirm-warmup-done-btn">Yes, I'm Ready!</button>
+            <button id="cancel-start-workout-btn">Not Yet</button>
+          </div>
+        </div>
+    </div>
+    
+    <!-- Progress Chart Modal -->
+    <div id="chart-modal" class="modal" style="display:none;">
+      <div class="modal-content chart-modal-content">
+        <h2 id="chart-title">Exercise Progress</h2>
+        <div class="chart-container">
+            <canvas id="progress-chart"></canvas>
+        </div>
         <div class="modal-actions">
-          <button id="confirm-warmup-done-btn">Yes, I'm Warmed Up!</button>
-          <button id="cancel-start-workout-btn">Not Yet / Go Back</button>
+          <button id="close-chart-btn">Close</button>
         </div>
       </div>
     </div>
+    
+    <!-- Exercise Editor Template -->
+    <template id="exercise-form-template">
+        <div class="exercise-form-item"><hr><h4>Exercise <span class="exercise-number">1</span></h4><div class="form-group"><label>Exercise Name:</label><input type="text" class="exercise-name-input" required></div><div class="form-group-inline"><div class="form-group"><label>Sets:</label><input type="number" class="exercise-sets-input" min="1" value="2" required></div><div class="form-group"><label>Reps:</label><input type="text" class="exercise-reps-input" placeholder="e.g., 10-15" value="10-15" required></div></div><div class="form-group-inline"><div class="form-group"><label>Rest Between Sets (sec):</label><input type="number" class="exercise-rest-between-sets-input" min="0" value="75" required></div><div class="form-group"><label>Rest After Exercise (sec):</label><input type="number" class="exercise-rest-after-exercise-input" min="0" value="105" required></div></div><div class="form-group"><label>Notes (Optional):</label><textarea class="exercise-notes-input"></textarea></div><button type="button" class="remove-exercise-btn">Remove This Exercise</button></div>
+    </template>
 
-    <footer>
-        <p>© 2024 Workout App</p>
-    </footer>
-
-    <!-- Audio cue for timer completion -->
+    <footer><p>© 2024 Workout App</p></footer>
     <audio id="timer-sound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" preload="auto"></audio>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
