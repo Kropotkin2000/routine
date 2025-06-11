@@ -36,17 +36,27 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
+/* === CORRECTED HEADER STYLES === */
 header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: var(--header-bg-color);
     color: var(--header-text-color);
-    padding: 1rem 0;
-    text-align: center;
-    position: relative;
+    padding: 1rem 15px;
     border-bottom: 1px solid var(--border-color);
 }
 
+h1 {
+    font-size: 1.5em;
+    margin: 0;
+    text-align: center;
+    flex-grow: 1; /* Allows title to take up space and stay centered */
+}
+/* =============================== */
+
 main {
-    padding: 15px; /* Reduced padding for mobile */
+    padding: 15px;
     max-width: 800px;
     margin: 20px auto;
     background-color: var(--main-bg-color);
@@ -55,18 +65,26 @@ main {
 }
 
 .view { margin-bottom: 20px; }
-h1 { font-size: 1.8em; }
 h2, h3 { color: var(--text-color); }
 ul { list-style-type: none; padding: 0; }
-#routine-list li, #history-list li { background-color: var(--list-item-bg-color); margin-bottom: 10px; padding: 15px; border-radius: 5px; display: flex; flex-direction: column; /* Default to column for easier mobile styling */ align-items: flex-start; gap: 10px; }
-#history-list li { cursor: pointer; flex-direction: row; justify-content: space-between; align-items: center; } /* History can stay as a row */
+#routine-list li, #history-list li { background-color: var(--list-item-bg-color); margin-bottom: 10px; padding: 15px; border-radius: 5px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+#history-list li { cursor: pointer; flex-direction: row; justify-content: space-between; align-items: center; }
 #history-list li:hover { background-color: var(--list-item-hover-bg-color); }
 #routine-list li .routine-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* Buttons */
 button { background-color: #5cb85c; color: white; border: none; padding: 10px 15px; font-size: 16px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease; }
 button:hover { background-color: #4cae4c; }
-.header-nav { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); display: flex; align-items: center; gap: 5px; }
+
+/* === CORRECTED HEADER NAV STYLES === */
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0; /* Prevents button group from shrinking */
+}
+/* =================================== */
+
 .nav-btn { background-color: #555; border: 1px solid #777; padding: 6px 10px; font-size: 14px; }
 .nav-btn:hover { background-color: #666; }
 .icon-btn { background: none; border: 2px solid white; color: white; font-size: 18px; width: 35px; height: 35px; padding: 0; line-height: 35px; text-align: center; }
@@ -98,7 +116,7 @@ body.dark-mode .icon-btn { border-color: #aaa; color: #aaa; }
 #routine-editor-view label { display: block; margin-bottom: 5px; font-weight: bold; }
 #editor-exercises-container .exercise-form-item { background-color: var(--list-item-bg-color); border: 1px solid var(--border-color); }
 #routine-form input, #routine-form textarea { background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); width: 100%; box-sizing: border-box; padding: 10px; border-radius: 4px; }
-.form-group-inline { display: flex; flex-direction: column; gap: 15px; } /* Stack by default */
+.form-group-inline { display: flex; flex-direction: column; gap: 15px; }
 #routine-form .form-actions { margin-top: 20px; text-align: right; }
 
 /* Log Detail View */
@@ -122,17 +140,13 @@ body.dark-mode footer #dev-mode-toggle { color: #555; }
 
 footer { text-align: center; margin-top: 30px; padding: 20px; background-color: var(--header-bg-color); color: var(--header-text-color); font-size: 0.9em; }
 
-/* ============================================== */
-/* ===         MEDIA QUERIES FOR DESKTOP      === */
-/* ============================================== */
-
+/* Media Queries for Desktop */
 @media (min-width: 600px) {
     h1 {
-        font-size: 2.5em;
+        font-size: 2.2em; /* Slightly smaller to give more room */
     }
     .header-nav {
         gap: 10px;
-        right: 20px;
     }
     .nav-btn {
         padding: 8px 12px;
@@ -148,30 +162,29 @@ footer { text-align: center; margin-top: 30px; padding: 20px; background-color: 
         padding: 20px;
     }
     #routine-list li {
-        flex-direction: row; /* Go back to row layout on desktop */
+        flex-direction: row;
         align-items: center;
     }
     #routine-list li .routine-actions {
         flex-wrap: nowrap;
     }
     .slider-group {
-        flex-direction: row; /* Sliders and inputs side-by-side */
+        flex-direction: row;
         align-items: center;
     }
     .slider-group .label-input-wrapper {
-        display: block; /* No longer need this wrapper */
+        display: block;
     }
     .slider-group label {
-        flex-basis: 70px; /* Fixed width for the label */
+        flex-basis: 70px;
     }
     .slider-group input[type="range"] {
         flex-grow: 1;
     }
     .slider-group input[type="number"] {
-        width: 70px;
-        flex-shrink: 0;
+        width: 80px;
     }
     .form-group-inline {
-        flex-direction: row; /* Editor form fields side-by-side */
+        flex-direction: row;
     }
 }
