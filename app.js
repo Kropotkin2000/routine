@@ -22,6 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const chartTitle = document.getElementById('chart-title');
     const closeChartBtn = document.getElementById('close-chart-btn');
 
+    // Dev Panel
+    const devPanel = document.getElementById('dev-panel');
+    const devModeToggle = document.getElementById('dev-mode-toggle');
+
     // --- App State ---
     let routines = [];
     let workoutLogs = [];
@@ -43,11 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Data Persistence
     function saveRoutines() { localStorage.setItem('workoutRoutines', JSON.stringify(routines)); }
-    function loadRoutines() { const stored = localStorage.getItem('workoutRoutines'); routines = stored ? JSON.parse(stored) : []; }
+    function loadRoutines() { routines = JSON.parse(localStorage.getItem('workoutRoutines')) || []; }
     function saveLogs() { localStorage.setItem('workoutLogs', JSON.stringify(workoutLogs)); }
-    function loadLogs() { const stored = localStorage.getItem('workoutLogs'); workoutLogs = stored ? JSON.parse(stored) : []; }
+    function loadLogs() { workoutLogs = JSON.parse(localStorage.getItem('workoutLogs')) || []; }
     
-    // Theming and Mute
+    // Theming, Mute, and Units
     function applyDarkMode(isDark) {
         body.classList.toggle('dark-mode', isDark);
         darkModeBtn.textContent = isDark ? '☀️' : '🌙';
@@ -112,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chartModal.style.display = 'flex';
     }
 
-    // --- History & Logs ---
+    // History & Logs
     function renderHistoryList() {
         historyListView.innerHTML = `<h2>Workout History</h2><ul id="history-list"></ul>`;
         const historyListUL = historyListView.querySelector('#history-list');
@@ -125,6 +129,19 @@ document.addEventListener('DOMContentLoaded', () => {
             li.addEventListener('click', () => renderLogDetail(log.id));
             historyListUL.appendChild(li);
         });
+        const clearBtn = document.createElement('button');
+        clearBtn.id = 'clear-history-btn';
+        clearBtn.textContent = 'Clear All History';
+        clearBtn.className = 'danger-zone-btn';
+        clearBtn.addEventListener('click', handleClearHistory);
+        historyListView.appendChild(clearBtn);
+    }
+    function handleClearHistory() {
+        if (confirm("DANGER: This will permanently delete all of your workout logs. Are you absolutely sure?")) {
+            workoutLogs = [];
+            saveLogs();
+            renderHistoryList();
+        }
     }
     function renderLogDetail(logId) {
         const log = workoutLogs.find(l => l.id === logId);
@@ -141,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showView(logDetailView);
     }
     
-    // --- Routine List & Editor ---
+    // Routine List & Editor
     function renderRoutineList() {
         routineListView.innerHTML = `<h2>Available Routines</h2><ul id="routine-list"></ul><button id="create-new-routine-btn">Create New Routine</button>`;
         const routineListUL = routineListView.querySelector('#routine-list');
@@ -193,15 +210,67 @@ document.addEventListener('DOMContentLoaded', () => {
         saveRoutines(); renderRoutineList(); showView(routineListView);
     }
 
-    // --- Player Logic ---
+    // Player Logic
     function startWorkout(id){const r=routines.find(rt=>rt.id===id);if(!r)return;currentWorkout={...currentWorkout,routine:r,log:{id:`log_${Date.now()}`,date:new Date().toISOString(),routineName:r.name,unit:weightUnit,exercises:[]},currentExerciseIndex:0,isResting:false};if(currentWorkout.timerInterval)clearInterval(currentWorkout.timerInterval);updatePlayerUI();showView(workoutPlayerView);}
-    function updatePlayerUI(){if(currentWorkout.isResting){workoutPlayerView.querySelector('#player-log-form').style.display='none';workoutPlayerView.querySelector('#player-timer-display').style.display='block';workoutPlayerView.querySelector('#player-exercise-info').style.display='none';}else{const ex=currentWorkout.routine.exercises[currentWorkout.currentExerciseIndex];if(!ex){workoutComplete();return;}workoutPlayerView.innerHTML=`<h2 id="player-routine-name">${currentWorkout.routine.name}</h2><div id="player-exercise-info"><h3 id="player-exercise-name">${ex.name}</h3><p class="notes">${ex.notes||""}</p></div><form id="player-log-form"><div id="player-sets-container"></div><div class="player-controls"><button type="submit">Log & Rest</button><button type="button" id="player-end-workout-btn">End</button></div></form><div id="player-timer-display" style="display:none;"><h3>RESTING</h3><p id="player-timer-value">00:00</p><button id="player-skip-rest-btn">Skip</button></div>`;const setsContainer=workoutPlayerView.querySelector('#player-sets-container');for(let i=0;i<ex.sets;i++){const setDiv=document.createElement('div');setDiv.className='set-log-item';setDiv.innerHTML=`<label>Set ${i+1}</label><div class="form-group"><input type="number" class="log-weight-input" placeholder="${weightUnit}" required></div><span>x</span><div class="form-group"><input type="number" class="log-reps-input" placeholder="reps" required></div>`;setsContainer.appendChild(setDiv);}workoutPlayerView.querySelector('#player-log-form').addEventListener('submit',handleLogExercise);workoutPlayerView.querySelector('#player-end-workout-btn').addEventListener('click',endWorkoutEarly);workoutPlayerView.querySelector('#player-skip-rest-btn').addEventListener('click',goToNextExercise);}}
+    function updatePlayerUI(){
+        if(currentWorkout.isResting){
+            workoutPlayerView.querySelector('#player-log-form').style.display = 'none';
+            workoutPlayerView.querySelector('#player-timer-display').style.display = 'block';
+            workoutPlayerView.querySelector('#player-exercise-info').style.display = 'none';
+        } else {
+            const ex = currentWorkout.routine.exercises[currentWorkout.currentExerciseIndex];
+            if(!ex){ workoutComplete(); return; }
+            workoutPlayerView.innerHTML = `
+                <h2 id="player-routine-name">${currentWorkout.routine.name}</h2>
+                <div id="player-exercise-info"><h3 id="player-exercise-name">${ex.name}</h3><p class="notes">${ex.notes||""}</p></div>
+                <form id="player-log-form">
+                    <div id="player-sets-container"></div>
+                    <div class="player-controls"><button type="submit">Log & Rest</button><button type="button" id="player-end-workout-btn">End</button></div>
+                </form>
+                <div id="player-timer-display" style="display:none;"><h3>RESTING</h3><p id="player-timer-value">00:00</p><button id="player-skip-rest-btn">Skip</button></div>`;
+            const setsContainer = workoutPlayerView.querySelector('#player-sets-container');
+            for(let i = 0; i < ex.sets; i++) {
+                const setDiv = document.createElement('div');
+                setDiv.className = 'set-log-item';
+                const weightMax = weightUnit === 'lbs' ? 500 : 250;
+                const weightStep = weightUnit === 'lbs' ? 2.5 : 1;
+                setDiv.innerHTML = `
+                    <h4>Set ${i + 1}</h4>
+                    <div class="slider-group">
+                        <label>Weight (${weightUnit})</label>
+                        <input type="range" class="log-weight-slider" min="0" max="${weightMax}" step="${weightStep}" value="0">
+                        <input type="number" class="log-weight-input" min="0" max="${weightMax}" step="${weightStep}" value="0" required>
+                    </div>
+                    <div class="slider-group">
+                        <label>Reps</label>
+                        <input type="range" class="log-reps-slider" min="0" max="30" step="1" value="10">
+                        <input type="number" class="log-reps-input" min="0" max="50" step="1" value="10" required>
+                    </div>`;
+                setsContainer.appendChild(setDiv);
+            }
+            workoutPlayerView.querySelectorAll('.set-log-item').forEach(item => {
+                const weightSlider = item.querySelector('.log-weight-slider'), weightInput = item.querySelector('.log-weight-input');
+                const repsSlider = item.querySelector('.log-reps-slider'), repsInput = item.querySelector('.log-reps-input');
+                weightSlider.addEventListener('input', () => { weightInput.value = weightSlider.value; });
+                weightInput.addEventListener('input', () => { weightSlider.value = weightInput.value; });
+                repsSlider.addEventListener('input', () => { repsInput.value = repsSlider.value; });
+                repsInput.addEventListener('input', () => { repsSlider.value = repsInput.value; });
+            });
+            workoutPlayerView.querySelector('#player-log-form').addEventListener('submit', handleLogExercise);
+            workoutPlayerView.querySelector('#player-end-workout-btn').addEventListener('click', endWorkoutEarly);
+            workoutPlayerView.querySelector('#player-skip-rest-btn').addEventListener('click', goToNextExercise);
+        }
+    }
     function handleLogExercise(e){e.preventDefault();const ex=currentWorkout.routine.exercises[currentWorkout.currentExerciseIndex];const logEx={name:ex.name,sets:[]};const setForms=workoutPlayerView.querySelectorAll('.set-log-item');let isValid=true;for(let sf of setForms){const w=sf.querySelector('.log-weight-input').value,r=sf.querySelector('.log-reps-input').value;if(w===''||r===''){alert('Fill all sets');isValid=false;break;}logEx.sets.push({weight:parseFloat(w),reps:parseInt(r)});}if(!isValid)return;currentWorkout.log.exercises.push(logEx);if(currentWorkout.currentExerciseIndex<currentWorkout.routine.exercises.length-1){startTimer(ex.restAfterExercise);}else{workoutComplete();}}
     function startTimer(duration){currentWorkout.isResting=true;updatePlayerUI();let timeLeft=duration;const timerVal=workoutPlayerView.querySelector('#player-timer-value');const updateDisplay=()=>{timerVal.textContent=`${String(Math.floor(timeLeft/60)).padStart(2,'0')}:${String(timeLeft%60).padStart(2,'0')}`;};const tick=()=>{timeLeft--;updateDisplay();if(timeLeft<0)goToNextExercise();};updateDisplay();currentWorkout.timerInterval=setInterval(tick,1000);}
     function goToNextExercise(){if(currentWorkout.timerInterval)clearInterval(currentWorkout.timerInterval);if(!isMuted)document.getElementById('timer-sound').play();currentWorkout.isResting=false;currentWorkout.currentExerciseIndex++;updatePlayerUI();}
     function workoutComplete(){if(currentWorkout.timerInterval)clearInterval(currentWorkout.timerInterval);workoutLogs.push(currentWorkout.log);saveLogs();alert("Workout Complete! Log saved.");resetWorkoutState();renderHistoryList();showView(historyListView);}
     function endWorkoutEarly(){if(confirm("End workout? Progress won't be saved.")){resetWorkoutState();showView(routineListView);}}
     function resetWorkoutState(){currentWorkout={...currentWorkout,routine:null,log:null,currentExerciseIndex:0,isResting:false,timerInterval:null,routineToStart:null};}
+    
+    // Dev Mode
+    function initializeDevMode(){devModeToggle.addEventListener('click',()=>{const isVisible=devPanel.style.display==='block';devPanel.style.display=isVisible?'none':'block';});devPanel.querySelector('#dev-add-logs-btn').addEventListener('click',addSampleLogs);devPanel.querySelector('#dev-clear-logs-btn').addEventListener('click',()=>{if(confirm("Dev: Clear all logs?")){workoutLogs=[];saveLogs();alert("Logs cleared.");renderHistoryList();}});devPanel.querySelector('#dev-clear-routines-btn').addEventListener('click',()=>{if(confirm("Dev: Clear all routines?")){routines=[];saveRoutines();alert("Routines cleared.");renderRoutineList();}});devPanel.querySelector('#dev-clear-all-btn').addEventListener('click',()=>{if(confirm("Dev: Clear ALL localStorage data?")){localStorage.clear();alert("All data cleared. Please refresh the page.");location.reload();}});}
+    function addSampleLogs(){if(!routines.length||!routines[0].exercises.length){alert("Create at least one routine with exercises before adding sample logs.");return;}const sampleLogs=[];const baseWeight=100;const baseReps=8;for(let i=0;i<5;i++){const date=new Date();date.setDate(date.getDate()-(i*7));const sampleLog={id:`log_sample_${Date.now()}_${i}`,date:date.toISOString(),routineName:routines[0].name,unit:'lbs',exercises:[]};routines[0].exercises.forEach(ex=>{sampleLog.exercises.push({name:ex.name,sets:[{weight:baseWeight+(i*5),reps:baseReps},{weight:baseWeight+(i*5),reps:baseReps-1}]});});sampleLogs.push(sampleLog);}workoutLogs=workoutLogs.concat(sampleLogs);saveLogs();alert("Added 5 sample logs based on your first routine.");renderHistoryList();}
 
     // --- Event Listeners ---
     homeBtn.addEventListener('click', () => showView(routineListView));
@@ -214,6 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDarkMode();
     initializeMuteButton();
     initializeUnitToggle();
+    initializeDevMode();
     loadRoutines();
     loadLogs();
     renderRoutineList();

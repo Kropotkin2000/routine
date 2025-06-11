@@ -25,7 +25,7 @@ body.dark-mode {
     --chart-grid-color: rgba(255, 255, 255, 0.1);
 }
 
-/* General Styles using variables */
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -46,7 +46,7 @@ header {
 }
 
 main {
-    padding: 20px;
+    padding: 15px; /* Reduced padding for mobile */
     max-width: 800px;
     margin: 20px auto;
     background-color: var(--main-bg-color);
@@ -55,45 +55,62 @@ main {
 }
 
 .view { margin-bottom: 20px; }
+h1 { font-size: 1.8em; }
 h2, h3 { color: var(--text-color); }
 ul { list-style-type: none; padding: 0; }
-#routine-list li, #history-list li { background-color: var(--list-item-bg-color); margin-bottom: 10px; padding: 15px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
-#history-list li { cursor: pointer; }
+#routine-list li, #history-list li { background-color: var(--list-item-bg-color); margin-bottom: 10px; padding: 15px; border-radius: 5px; display: flex; flex-direction: column; /* Default to column for easier mobile styling */ align-items: flex-start; gap: 10px; }
+#history-list li { cursor: pointer; flex-direction: row; justify-content: space-between; align-items: center; } /* History can stay as a row */
 #history-list li:hover { background-color: var(--list-item-hover-bg-color); }
-#routine-list li .routine-actions button, #log-detail-back-btn { margin-left: 10px; }
+#routine-list li .routine-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* Buttons */
 button { background-color: #5cb85c; color: white; border: none; padding: 10px 15px; font-size: 16px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease; }
 button:hover { background-color: #4cae4c; }
-.header-nav { position: absolute; top: 50%; right: 20px; transform: translateY(-50%); display: flex; align-items: center; gap: 10px; }
-.nav-btn { background-color: #555; border: 1px solid #777; padding: 8px 12px; }
+.header-nav { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); display: flex; align-items: center; gap: 5px; }
+.nav-btn { background-color: #555; border: 1px solid #777; padding: 6px 10px; font-size: 14px; }
 .nav-btn:hover { background-color: #666; }
-.icon-btn { background: none; border: 2px solid white; color: white; font-size: 20px; width: 40px; height: 40px; padding: 0; line-height: 40px; text-align: center; }
+.icon-btn { background: none; border: 2px solid white; color: white; font-size: 18px; width: 35px; height: 35px; padding: 0; line-height: 35px; text-align: center; }
 body.dark-mode .icon-btn { border-color: #aaa; color: #aaa; }
 .icon-btn:hover { background: rgba(255, 255, 255, 0.2); }
 #player-end-workout-btn, #cancel-start-workout-btn, #editor-cancel-btn, .delete-routine-btn, .remove-exercise-btn, #log-detail-back-btn, #close-chart-btn { background-color: #d9534f; }
 #player-end-workout-btn:hover, #cancel-start-workout-btn:hover, #editor-cancel-btn:hover, .delete-routine-btn:hover, .remove-exercise-btn:hover, #log-detail-back-btn:hover, #close-chart-btn:hover { background-color: #c9302c; }
+.danger-zone-btn { background-color: #b30000; margin-top: 20px; display: block; margin-left: auto; margin-right: auto; }
+.danger-zone-btn:hover { background-color: #800000; }
 #create-new-routine-btn, .edit-routine-btn, #editor-add-exercise-btn, #player-skip-rest-btn { background-color: #5bc0de; }
 #create-new-routine-btn:hover, .edit-routine-btn:hover, #editor-add-exercise-btn:hover, #player-skip-rest-btn:hover { background-color: #46b8da; }
 .duplicate-routine-btn, #unit-toggle-btn { background-color: #f0ad4e; }
 .duplicate-routine-btn:hover, #unit-toggle-btn:hover { background-color: #ec971f; }
 
 /* Player & Log Details */
-#player-exercise-info, #log-detail-exercises li { background-color: var(--list-item-bg-color); border: 1px solid var(--border-color); padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+#player-exercise-info, #log-detail-exercises li { background-color: var(--list-item-bg-color); border: 1px solid var(--border-color); padding: 15px; margin-bottom: 20px; border-radius: 8px; }
 #player-exercise-info .notes { font-style: italic; color: var(--note-text-color); }
 #player-timer-display { font-size: 1.5em; color: #d9534f; margin-bottom: 20px; }
-.set-log-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px; border-bottom: 1px solid var(--border-color); }
+.set-log-item { display: block; padding: 15px; border-bottom: 1px solid var(--border-color); }
 .set-log-item:last-child { border-bottom: none; }
-.set-log-item input { width: 100%; box-sizing: border-box; padding: 8px; border-radius: 4px; text-align: center; background-color: var(--main-bg-color); border: 1px solid var(--border-color); color: var(--text-color); }
+.slider-group { display: flex; flex-direction: column; align-items: stretch; gap: 10px; margin-top: 10px; }
+.slider-group .label-input-wrapper { display: flex; justify-content: space-between; align-items: center; }
+.slider-group label { font-weight: bold; }
+.slider-group input[type="range"] { width: 100%; }
+.slider-group input[type="number"] { width: 80px; text-align: center; background-color: var(--main-bg-color); border: 1px solid var(--border-color); color: var(--text-color); padding: 8px; border-radius: 4px; }
 
 /* Routine Editor */
+#routine-editor-view .form-group { margin-bottom: 15px; }
+#routine-editor-view label { display: block; margin-bottom: 5px; font-weight: bold; }
 #editor-exercises-container .exercise-form-item { background-color: var(--list-item-bg-color); border: 1px solid var(--border-color); }
-#routine-form input, #routine-form textarea { background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); }
-.form-group-inline { display: flex; gap: 15px; }
+#routine-form input, #routine-form textarea { background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); width: 100%; box-sizing: border-box; padding: 10px; border-radius: 4px; }
+.form-group-inline { display: flex; flex-direction: column; gap: 15px; } /* Stack by default */
+#routine-form .form-actions { margin-top: 20px; text-align: right; }
 
-/* Log Detail View: Clickable exercise names */
+/* Log Detail View */
 #log-detail-exercises .exercise-name { font-size: 1.2em; font-weight: bold; cursor: pointer; color: #5bc0de; }
 #log-detail-exercises .exercise-name:hover { text-decoration: underline; }
+
+/* Dev Panel */
+#dev-panel { background-color: var(--list-item-bg-color); border: 2px dashed #f0ad4e; padding: 15px; margin: 20px auto; max-width: 800px; border-radius: 8px; text-align: center; }
+#dev-panel h3 { margin-top: 0; color: #f0ad4e; }
+#dev-panel button { margin: 5px; }
+footer #dev-mode-toggle { cursor: pointer; font-style: italic; color: #888; }
+body.dark-mode footer #dev-mode-toggle { color: #555; }
 
 /* Modals */
 .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; }
@@ -104,4 +121,57 @@ body.dark-mode .icon-btn { border-color: #aaa; color: #aaa; }
 .modal-actions button { margin-left: 10px; }
 
 footer { text-align: center; margin-top: 30px; padding: 20px; background-color: var(--header-bg-color); color: var(--header-text-color); font-size: 0.9em; }
-@media (max-width: 600px) { .header-nav { gap: 5px; right: 10px; } .icon-btn { width: 35px; height: 35px; line-height: 35px; font-size: 18px; } .form-group-inline { flex-direction: column; gap: 0; } }
+
+/* ============================================== */
+/* ===         MEDIA QUERIES FOR DESKTOP      === */
+/* ============================================== */
+
+@media (min-width: 600px) {
+    h1 {
+        font-size: 2.5em;
+    }
+    .header-nav {
+        gap: 10px;
+        right: 20px;
+    }
+    .nav-btn {
+        padding: 8px 12px;
+        font-size: 16px;
+    }
+    .icon-btn {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 20px;
+    }
+    main {
+        padding: 20px;
+    }
+    #routine-list li {
+        flex-direction: row; /* Go back to row layout on desktop */
+        align-items: center;
+    }
+    #routine-list li .routine-actions {
+        flex-wrap: nowrap;
+    }
+    .slider-group {
+        flex-direction: row; /* Sliders and inputs side-by-side */
+        align-items: center;
+    }
+    .slider-group .label-input-wrapper {
+        display: block; /* No longer need this wrapper */
+    }
+    .slider-group label {
+        flex-basis: 70px; /* Fixed width for the label */
+    }
+    .slider-group input[type="range"] {
+        flex-grow: 1;
+    }
+    .slider-group input[type="number"] {
+        width: 70px;
+        flex-shrink: 0;
+    }
+    .form-group-inline {
+        flex-direction: row; /* Editor form fields side-by-side */
+    }
+}
