@@ -1,19 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
     const body = document.body;
+    const appHeader = document.getElementById('app-header');
     const allViews = document.querySelectorAll('.view');
     const routineListView = document.getElementById('routine-list-view');
     const workoutPlayerView = document.getElementById('workout-player-view');
     const routineEditorView = document.getElementById('routine-editor-view');
     const historyListView = document.getElementById('history-list-view');
     const logDetailView = document.getElementById('log-detail-view');
-
-    // Nav & Toggles
-    const homeBtn = document.getElementById('home-btn');
-    const historyBtn = document.getElementById('history-btn');
-    const muteBtn = document.getElementById('mute-btn');
-    const darkModeBtn = document.getElementById('dark-mode-btn');
-    const unitToggleBtn = document.getElementById('unit-toggle-btn');
 
     // Modals
     const warmupModal = document.getElementById('warmup-reminder-modal');
@@ -38,11 +32,38 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // --- Functions ---
+    function buildHeader() {
+        appHeader.innerHTML = `
+            <h1>My Workout Routines</h1>
+            <div class="header-nav">
+                <button id="history-btn" class="nav-btn">History</button>
+                <button id="home-btn" class="nav-btn" style="display: none;">Routines</button>
+                <button id="unit-toggle-btn" class="nav-btn">lbs</button>
+                <button id="dark-mode-btn" class="icon-btn">🌙</button>
+                <button id="mute-btn" class="icon-btn">🔊</button>
+            </div>`;
+        const homeBtn = appHeader.querySelector('#home-btn');
+        const historyBtn = appHeader.querySelector('#history-btn');
+        const darkModeBtn = appHeader.querySelector('#dark-mode-btn');
+        const muteBtn = appHeader.querySelector('#mute-btn');
+        const unitToggleBtn = appHeader.querySelector('#unit-toggle-btn');
+        
+        homeBtn.addEventListener('click', () => showView(routineListView));
+        historyBtn.addEventListener('click', () => { renderHistoryList(); showView(historyListView); });
+        initializeDarkMode(darkModeBtn);
+        initializeMuteButton(muteBtn);
+        initializeUnitToggle(unitToggleBtn);
+    }
+    
     function showView(viewToShow) {
         allViews.forEach(view => view.style.display = 'none');
         if (viewToShow) viewToShow.style.display = 'block';
-        homeBtn.style.display = viewToShow === routineListView ? 'none' : 'inline-block';
-        historyBtn.style.display = viewToShow === historyListView ? 'none' : 'inline-block';
+        const homeBtn = appHeader.querySelector('#home-btn');
+        const historyBtn = appHeader.querySelector('#history-btn');
+        if (homeBtn && historyBtn) {
+            homeBtn.style.display = viewToShow === routineListView ? 'none' : 'inline-block';
+            historyBtn.style.display = viewToShow === historyListView ? 'none' : 'inline-block';
+        }
     }
 
     // Data Persistence
@@ -52,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadLogs() { workoutLogs = JSON.parse(localStorage.getItem('workoutLogs')) || []; }
     
     // Theming, Mute, and Units
-    function applyDarkMode(isDark) {
+    function applyDarkMode(isDark, darkModeBtn) {
         body.classList.toggle('dark-mode', isDark);
         darkModeBtn.textContent = isDark ? '☀️' : '🌙';
         localStorage.setItem('darkMode', isDark);
@@ -67,26 +88,52 @@ document.addEventListener('DOMContentLoaded', () => {
             chartInstance.update();
         }
     }
-    function initializeDarkMode() {
+    function initializeDarkMode(darkModeBtn) {
         const userPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         const savedMode = localStorage.getItem('darkMode');
-        applyDarkMode(savedMode !== null ? savedMode === 'true' : userPrefersDark);
-        darkModeBtn.addEventListener('click', () => applyDarkMode(!body.classList.contains('dark-mode')));
+        const isDark = savedMode !== null ? savedMode === 'true' : userPrefersDark;
+        applyDarkMode(isDark, darkModeBtn);
+        darkModeBtn.addEventListener('click', () => applyDarkMode(!body.classList.contains('dark-mode'), darkModeBtn));
     }
-    function initializeMuteButton() {
+    function initializeMuteButton(muteBtn) {
         const savedMuteState = localStorage.getItem('isMuted');
         isMuted = savedMuteState === 'true';
         muteBtn.textContent = isMuted ? '🔇' : '🔊';
         muteBtn.addEventListener('click', () => { isMuted = !isMuted; localStorage.setItem('isMuted', isMuted); muteBtn.textContent = isMuted ? '🔇' : '🔊'; });
     }
-    function initializeUnitToggle() {
+    function initializeUnitToggle(unitToggleBtn) {
         const savedUnit = localStorage.getItem('weightUnit');
         if (savedUnit) weightUnit = savedUnit;
         unitToggleBtn.textContent = weightUnit;
         unitToggleBtn.addEventListener('click', () => {
-            weightUnit = weightUnit === 'lbs' ? 'kg' : 'lbs';
+            const oldUnit = weightUnit;
+            weightUnit = oldUnit === 'lbs' ? 'kg' : 'lbs';
             unitToggleBtn.textContent = weightUnit;
             localStorage.setItem('weightUnit', weightUnit);
+            if (currentWorkout.log) { currentWorkout.log.unit = weightUnit; }
+            if (workoutPlayerView.style.display === 'block' && !currentWorkout.isResting) {
+                const newMax = weightUnit === 'lbs' ? 500 : 250;
+                const newStep = weightUnit === 'lbs' ? 2.5 : 1;
+                workoutPlayerView.querySelectorAll('.set-log-item').forEach(item => {
+                    const weightSlider = item.querySelector('.log-weight-slider');
+                    const weightInput = item.querySelector('.log-weight-input');
+                    const weightLabel = item.querySelector('.slider-group label');
+                    if (weightLabel && weightLabel.textContent.includes('Weight')) {
+                        const currentValue = parseFloat(weightInput.value);
+                        let convertedValue;
+                        if (oldUnit === 'lbs' && weightUnit === 'kg') { convertedValue = (currentValue * 0.453592).toFixed(1); }
+                        else if (oldUnit === 'kg' && weightUnit === 'lbs') { convertedValue = Math.round(currentValue * 2.20462); }
+                        else { convertedValue = currentValue; }
+                        weightLabel.textContent = `Weight (${weightUnit})`;
+                        weightInput.placeholder = weightUnit;
+                        weightInput.step = newStep;
+                        weightInput.value = convertedValue;
+                        weightSlider.max = newMax;
+                        weightSlider.step = newStep;
+                        weightSlider.value = convertedValue;
+                    }
+                });
+            }
         });
     }
 
@@ -116,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chartModal.style.display = 'flex';
     }
 
-    // History & Logs
+    // --- History & Logs ---
     function renderHistoryList() {
         historyListView.innerHTML = `<h2>Workout History</h2><ul id="history-list"></ul>`;
         const historyListUL = historyListView.querySelector('#history-list');
@@ -136,13 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearBtn.addEventListener('click', handleClearHistory);
         historyListView.appendChild(clearBtn);
     }
-    function handleClearHistory() {
-        if (confirm("DANGER: This will permanently delete all of your workout logs. Are you absolutely sure?")) {
-            workoutLogs = [];
-            saveLogs();
-            renderHistoryList();
-        }
-    }
+    function handleClearHistory() { if (confirm("DANGER: This will permanently delete all of your workout logs. Are you absolutely sure?")) { workoutLogs = []; saveLogs(); renderHistoryList(); } }
     function renderLogDetail(logId) {
         const log = workoutLogs.find(l => l.id === logId);
         if (!log) return;
@@ -158,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showView(logDetailView);
     }
     
-    // Routine List & Editor
+    // --- Routine List & Editor ---
     function renderRoutineList() {
         routineListView.innerHTML = `<h2>Available Routines</h2><ul id="routine-list"></ul><button id="create-new-routine-btn">Create New Routine</button>`;
         const routineListUL = routineListView.querySelector('#routine-list');
@@ -182,11 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const routine = routines.find(r => r.id === routineId);
         routineEditorView.innerHTML = `<h2 id="editor-view-title">${routineId ? "Edit" : "Create"} Routine</h2><form id="routine-form"><input type="hidden" id="editor-routine-id" value="${routineId || ""}"><div class="form-group"><label for="editor-routine-name-input">Routine Name:</label><input type="text" id="editor-routine-name-input" value="${routine ? routine.name : ""}" required></div><div class="form-group"><label for="editor-routine-description-input">Description:</label><textarea id="editor-routine-description-input">${routine ? routine.description || "" : ""}</textarea></div><h3>Exercises:</h3><div id="editor-exercises-container"></div><button type="button" id="editor-add-exercise-btn">Add Exercise</button><div class="form-actions"><button type="submit">Save Routine</button><button type="button" id="editor-cancel-btn">Cancel</button></div></form>`;
         const container = routineEditorView.querySelector('#editor-exercises-container');
-        if (routine && routine.exercises.length > 0) {
-            routine.exercises.forEach(ex => addExerciseToForm(container, ex));
-        } else {
-            addExerciseToForm(container);
-        }
+        if (routine && routine.exercises.length > 0) { routine.exercises.forEach(ex => addExerciseToForm(container, ex)); } else { addExerciseToForm(container); }
         updateExerciseNumbers(container);
         showView(routineEditorView);
         routineEditorView.querySelector('#editor-routine-name-input').focus();
@@ -210,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveRoutines(); renderRoutineList(); showView(routineListView);
     }
 
-    // Player Logic
+    // --- Player Logic ---
     function startWorkout(id){const r=routines.find(rt=>rt.id===id);if(!r)return;currentWorkout={...currentWorkout,routine:r,log:{id:`log_${Date.now()}`,date:new Date().toISOString(),routineName:r.name,unit:weightUnit,exercises:[]},currentExerciseIndex:0,isResting:false};if(currentWorkout.timerInterval)clearInterval(currentWorkout.timerInterval);updatePlayerUI();showView(workoutPlayerView);}
     function updatePlayerUI(){
         if(currentWorkout.isResting){
@@ -239,12 +276,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="slider-group">
                         <label>Weight (${weightUnit})</label>
                         <input type="range" class="log-weight-slider" min="0" max="${weightMax}" step="${weightStep}" value="0">
-                        <input type="number" class="log-weight-input" min="0" max="${weightMax}" step="${weightStep}" value="0" required>
+                        <input type="number" class="log-weight-input" min="0" max="${weightMax}" step="${weightStep}" value="0" placeholder="${weightUnit}" required>
                     </div>
                     <div class="slider-group">
                         <label>Reps</label>
                         <input type="range" class="log-reps-slider" min="0" max="30" step="1" value="10">
-                        <input type="number" class="log-reps-input" min="0" max="50" step="1" value="10" required>
+                        <input type="number" class="log-reps-input" min="0" max="50" step="1" value="10" placeholder="reps" required>
                     </div>`;
                 setsContainer.appendChild(setDiv);
             }
@@ -269,20 +306,41 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetWorkoutState(){currentWorkout={...currentWorkout,routine:null,log:null,currentExerciseIndex:0,isResting:false,timerInterval:null,routineToStart:null};}
     
     // Dev Mode
-    function initializeDevMode(){devModeToggle.addEventListener('click',()=>{const isVisible=devPanel.style.display==='block';devPanel.style.display=isVisible?'none':'block';});devPanel.querySelector('#dev-add-logs-btn').addEventListener('click',addSampleLogs);devPanel.querySelector('#dev-clear-logs-btn').addEventListener('click',()=>{if(confirm("Dev: Clear all logs?")){workoutLogs=[];saveLogs();alert("Logs cleared.");renderHistoryList();}});devPanel.querySelector('#dev-clear-routines-btn').addEventListener('click',()=>{if(confirm("Dev: Clear all routines?")){routines=[];saveRoutines();alert("Routines cleared.");renderRoutineList();}});devPanel.querySelector('#dev-clear-all-btn').addEventListener('click',()=>{if(confirm("Dev: Clear ALL localStorage data?")){localStorage.clear();alert("All data cleared. Please refresh the page.");location.reload();}});}
-    function addSampleLogs(){if(!routines.length||!routines[0].exercises.length){alert("Create at least one routine with exercises before adding sample logs.");return;}const sampleLogs=[];const baseWeight=100;const baseReps=8;for(let i=0;i<5;i++){const date=new Date();date.setDate(date.getDate()-(i*7));const sampleLog={id:`log_sample_${Date.now()}_${i}`,date:date.toISOString(),routineName:routines[0].name,unit:'lbs',exercises:[]};routines[0].exercises.forEach(ex=>{sampleLog.exercises.push({name:ex.name,sets:[{weight:baseWeight+(i*5),reps:baseReps},{weight:baseWeight+(i*5),reps:baseReps-1}]});});sampleLogs.push(sampleLog);}workoutLogs=workoutLogs.concat(sampleLogs);saveLogs();alert("Added 5 sample logs based on your first routine.");renderHistoryList();}
+    function initializeDevMode(){
+        devModeToggle.addEventListener('click',()=>{const isVisible=devPanel.style.display==='block';devPanel.style.display=isVisible?'none':'block';});
+        devPanel.querySelector('#dev-add-logs-btn').addEventListener('click',addSampleLogs);
+        devPanel.querySelector('#dev-clear-logs-btn').addEventListener('click',()=>{if(confirm("Dev: Clear all logs?")){workoutLogs=[];saveLogs();alert("Logs cleared.");renderHistoryList();}});
+        devPanel.querySelector('#dev-clear-routines-btn').addEventListener('click',()=>{if(confirm("Dev: Clear all routines?")){routines=[];saveRoutines();alert("Routines cleared.");renderRoutineList();}});
+        devPanel.querySelector('#dev-clear-all-btn').addEventListener('click',()=>{if(confirm("Dev: Clear ALL localStorage data?")){localStorage.clear();alert("All data cleared. Please refresh the page.");location.reload();}});
+        devPanel.querySelector('#dev-import-btn').addEventListener('click',handleDevImport);
+    }
+    function handleDevImport(){
+        const importText=devPanel.querySelector('#dev-import-textarea').value;
+        if(!importText.trim()){alert("Text area is empty.");return;}
+        try{
+            const newRoutine=JSON.parse(importText);
+            if(!newRoutine.name||!Array.isArray(newRoutine.exercises)){throw new Error("Invalid structure.");}
+            newRoutine.id=`routine_${Date.now()}`;
+            routines.push(newRoutine);
+            saveRoutines();
+            renderRoutineList();
+            alert(`Imported: "${newRoutine.name}"`);
+            devPanel.querySelector('#dev-import-textarea').value='';
+            showView(routineListView);
+        } catch(error){
+            console.error("Import Error:",error);
+            alert("Import failed! Invalid JSON format.");
+        }
+    }
+    function addSampleLogs(){if(!routines.length||!routines[0].exercises.length){alert("Create at least one routine with exercises before adding sample logs.");return;}const sampleLogs=[];const baseWeight=100;const baseReps=8;for(let i=4;i>=0;i--){const date=new Date();date.setDate(date.getDate()-(i*7));const sampleLog={id:`log_sample_${Date.now()}_${i}`,date:date.toISOString(),routineName:routines[0].name,unit:'lbs',exercises:[]};routines[0].exercises.forEach(ex=>{sampleLog.exercises.push({name:ex.name,sets:[{weight:baseWeight+(i*5),reps:baseReps},{weight:baseWeight+(i*5),reps:baseReps-1}]});});sampleLogs.push(sampleLog);}workoutLogs=workoutLogs.concat(sampleLogs);saveLogs();alert("Added 5 sample logs based on your first routine.");renderHistoryList();}
 
     // --- Event Listeners ---
-    homeBtn.addEventListener('click', () => showView(routineListView));
-    historyBtn.addEventListener('click', () => { renderHistoryList(); showView(historyListView); });
     closeChartBtn.addEventListener('click', () => chartModal.style.display = 'none');
     warmupModal.querySelector('#confirm-warmup-done-btn').addEventListener('click', () => { warmupModal.style.display = 'none'; if (currentWorkout.routineToStart) startWorkout(currentWorkout.routineToStart); });
     warmupModal.querySelector('#cancel-start-workout-btn').addEventListener('click', () => { warmupModal.style.display = 'none'; currentWorkout.routineToStart = null; });
 
     // --- Initialization ---
-    initializeDarkMode();
-    initializeMuteButton();
-    initializeUnitToggle();
+    buildHeader();
     initializeDevMode();
     loadRoutines();
     loadLogs();
