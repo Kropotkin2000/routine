@@ -57,9 +57,21 @@
         </div>
       </div>
     </div>
+
+    <div id="jump-to-modal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <h2>Jump To Exercise</h2>
+        <ul id="jump-to-list">
+          <!-- Remaining exercises will be populated here by JS -->
+        </ul>
+        <div class="modal-actions">
+          <button id="close-jump-modal-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
     
     <template id="exercise-form-template">
-        <div class="exercise-form-item"><hr><h4>Exercise <span class="exercise-number">1</span></h4><div class="form-group"><label>Exercise Name:</label><input type="text" class="exercise-name-input" required></div><div class="form-group-inline"><div class="form-group"><label>Sets:</label><input type="number" class="exercise-sets-input" min="1" value="2" required></div><div class="form-group"><label>Reps:</label><input type="text" class="exercise-reps-input" placeholder="e.g., 10-15" value="10-15" required></div></div><div class="form-group-inline"><div class="form-group"><label>Rest Between Sets (sec):</label><input type="number" class="exercise-rest-between-sets-input" min="0" value="75" required></div><div class="form-group"><label>Rest After Exercise (sec):</label><input type="number" class="exercise-rest-after-exercise-input" min="0" value="105" required></div></div><div class="form-group"><label>Notes (Optional):</label><textarea class="exercise-notes-input"></textarea></div><button type="button" class="remove-exercise-btn">Remove This Exercise</button></div>
+        <div class="exercise-form-item"><hr><h4>Exercise <span class="exercise-number">1</span></h4><div class="form-group"><label>Exercise Name:</label><input type="text" class="exercise-name-input" required></div><div class="form-group-inline"><div class="form-group"><label>Sets:</label><input type="number" class="exercise-sets-input" min="1" value="3" required></div><div class="form-group"><label>Reps:</label><input type="text" class="exercise-reps-input" placeholder="e.g., 8-12" value="8-12" required></div></div><div class="form-group-inline"><div class="form-group"><label>Rest Between Sets (sec):</label><input type="number" class="exercise-rest-between-sets-input" min="0" value="180" required></div><div class="form-group"><label>Rest After Exercise (sec):</label><input type="number" class="exercise-rest-after-exercise-input" min="0" value="180" required></div></div><div class="form-group"><label>Notes (Optional):</label><textarea class="exercise-notes-input"></textarea></div><button type="button" class="remove-exercise-btn">Remove This Exercise</button></div>
     </template>
 
     <footer><p>© 2024 Workout App <span id="dev-mode-toggle">(Dev)</span></p></footer>

@@ -1,4 +1,4 @@
-/* === style.css (Complete and Corrected with CSS Grid Header) === */
+/* === style.css (Complete and Final) === */
 
 /* CSS Variables */
 :root { --bg-color: #f4f4f4; --main-bg-color: #fff; --text-color: #333; --header-bg-color: #333; --header-text-color: #fff; --list-item-bg-color: #e9e9e9; --list-item-hover-bg-color: #ddd; --border-color: #ddd; --note-text-color: #555; --chart-grid-color: rgba(0, 0, 0, 0.1); }
@@ -14,19 +14,19 @@ header {
     align-items: center;
     background-color: var(--header-bg-color);
     color: var(--header-text-color);
-    padding: 0.5rem 15px; /* Adjust padding */
+    padding: 0.5rem 15px;
     border-bottom: 1px solid var(--border-color);
 }
 header h1 {
-    grid-column: 2 / 3; /* The title sits in the middle column */
+    grid-column: 2 / 3;
     font-size: 1.5em;
     margin: 0;
     text-align: center;
-    white-space: nowrap; /* Prevents title from wrapping */
+    white-space: nowrap;
 }
 .header-nav {
-    grid-column: 3 / 4; /* The nav buttons sit in the right column */
-    justify-self: end; /* Aligns the group to the far right */
+    grid-column: 3 / 4;
+    justify-self: end;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -49,12 +49,12 @@ button:hover { background-color: #4cae4c; }
 .icon-btn { background: none; border: 2px solid white; color: white; font-size: 18px; width: 35px; height: 35px; padding: 0; line-height: 35px; text-align: center; }
 body.dark-mode .icon-btn { border-color: #aaa; color: #aaa; }
 .icon-btn:hover { background: rgba(255, 255, 255, 0.2); }
-#player-end-workout-btn, #cancel-start-workout-btn, #editor-cancel-btn, .delete-routine-btn, .remove-exercise-btn, #log-detail-back-btn, #close-chart-btn { background-color: #d9534f; }
-#player-end-workout-btn:hover, #cancel-start-workout-btn:hover, #editor-cancel-btn:hover, .delete-routine-btn:hover, .remove-exercise-btn:hover, #log-detail-back-btn:hover, #close-chart-btn:hover { background-color: #c9302c; }
+#player-end-workout-btn, #cancel-start-workout-btn, #editor-cancel-btn, .delete-routine-btn, .remove-exercise-btn, #log-detail-back-btn, #close-chart-btn, #close-jump-modal-btn { background-color: #d9534f; }
+#player-end-workout-btn:hover, #cancel-start-workout-btn:hover, #editor-cancel-btn:hover, .delete-routine-btn:hover, .remove-exercise-btn:hover, #log-detail-back-btn:hover, #close-chart-btn:hover, #close-jump-modal-btn:hover { background-color: #c9302c; }
 .danger-zone-btn { background-color: #b30000; margin-top: 20px; display: block; margin-left: auto; margin-right: auto; }
 .danger-zone-btn:hover { background-color: #800000; }
-#create-new-routine-btn, .edit-routine-btn, #editor-add-exercise-btn, #player-skip-rest-btn { background-color: #5bc0de; }
-#create-new-routine-btn:hover, .edit-routine-btn:hover, #editor-add-exercise-btn:hover, #player-skip-rest-btn:hover { background-color: #46b8da; }
+#create-new-routine-btn, .edit-routine-btn, #editor-add-exercise-btn, #player-skip-rest-btn, #player-jump-to-btn { background-color: #5bc0de; }
+#create-new-routine-btn:hover, .edit-routine-btn:hover, #editor-add-exercise-btn:hover, #player-skip-rest-btn:hover, #player-jump-to-btn:hover { background-color: #46b8da; }
 .duplicate-routine-btn, #unit-toggle-btn { background-color: #f0ad4e; }
 .duplicate-routine-btn:hover, #unit-toggle-btn:hover { background-color: #ec971f; }
 
@@ -98,6 +98,9 @@ body.dark-mode footer #dev-mode-toggle { color: #555; }
 .chart-container { position: relative; height: 60vh; width: 100%; }
 .modal-actions { margin-top: 25px; text-align: right; }
 .modal-actions button { margin-left: 10px; }
+#jump-to-list { list-style: none; padding: 0; margin: 0; }
+#jump-to-list li { background-color: var(--list-item-bg-color); padding: 15px; margin-bottom: 10px; border-radius: 5px; cursor: pointer; text-align: center; font-weight: bold; transition: background-color 0.2s; }
+#jump-to-list li:hover { background-color: var(--list-item-hover-bg-color); color: #5bc0de; }
 
 footer { text-align: center; margin-top: 30px; padding: 20px; background-color: var(--header-bg-color); color: var(--header-text-color); font-size: 0.9em; }
 
