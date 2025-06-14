@@ -7,76 +7,53 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- The header is now built by JavaScript for robustness -->
-    <header id="app-header"></header>
+    <header id="app-header">
+        <h1>My Workout Routines</h1>
+        <div class="header-nav">
+            <button id="history-btn" class="nav-btn">History</button>
+            <button id="home-btn" class="nav-btn" style="display: none;">Routines</button>
+            <button id="unit-toggle-btn" class="nav-btn">lbs</button>
+            <button id="dark-mode-btn" class="icon-btn">🌙</button>
+            <button id="mute-btn" class="icon-btn">🔊</button>
+        </div>
+    </header>
 
     <main>
-        <section id="routine-list-view" class="view"></section>
+        <section id="routine-list-view" class="view">
+            <h2>Available Routines</h2>
+            <ul id="routine-list"></ul>
+            <button id="create-new-routine-btn">Create New Routine</button>
+        </section>
+
         <section id="workout-player-view" class="view" style="display: none;"></section>
+
         <section id="routine-editor-view" class="view" style="display: none;"></section>
-        <section id="history-list-view" class="view" style="display: none;"></section>
+        
+        <section id="history-list-view" class="view" style="display: none;">
+            <h2>Workout History</h2>
+            <ul id="history-list"></ul>
+            <div id="history-actions"></div>
+        </section>
+
         <section id="log-detail-view" class="view" style="display: none;"></section>
     </main>
 
-    <!-- Dev Panel (Initially Hidden) -->
+    <!-- Dev Panel -->
     <div id="dev-panel" style="display: none;">
         <h3>Developer Tools</h3>
-        <div class="dev-section">
-            <button id="dev-add-logs-btn">Add 5 Sample Logs</button>
-            <button id="dev-clear-logs-btn">Clear All Logs</button>
-            <button id="dev-clear-routines-btn">Clear All Routines</button>
-            <button id="dev-clear-all-btn">Clear ALL Data</button>
-        </div>
-        <div class="dev-section">
-            <h4>Import Routine</h4>
-            <textarea id="dev-import-textarea" placeholder="Paste routine JSON here..."></textarea>
-            <button id="dev-import-btn">Import from JSON</button>
-        </div>
+        <div class="dev-section"><button id="dev-add-logs-btn">Add 5 Sample Logs</button><button id="dev-clear-logs-btn">Clear All Logs</button><button id="dev-clear-routines-btn">Clear All Routines</button><button id="dev-clear-all-btn">Clear ALL Data</button></div>
+        <div class="dev-section"><h4>Import Routine</h4><textarea id="dev-import-textarea" placeholder="Paste routine JSON here..."></textarea><button id="dev-import-btn">Import from JSON</button></div>
     </div>
 
-    <!-- Modals and Templates -->
-    <div id="warmup-reminder-modal" class="modal" style="display:none;">
-        <div class="modal-content">
-          <h2>Ready to Go? Warm-up Check!</h2>
-          <p>A proper warm-up is crucial for a great and safe workout. Have you warmed up?</p>
-          <div class="modal-actions">
-            <button id="confirm-warmup-done-btn">Yes, I'm Ready!</button>
-            <button id="cancel-start-workout-btn">Not Yet</button>
-          </div>
-        </div>
-    </div>
+    <!-- Modals -->
+    <div id="warmup-reminder-modal" class="modal" style="display:none;"><div class="modal-content"><h2>Ready to Go?</h2><p>Have you completed your warm-up?</p><div class="modal-actions"><button id="confirm-warmup-done-btn">Yes, I'm Ready!</button><button id="cancel-start-workout-btn">Not Yet</button></div></div></div>
+    <div id="chart-modal" class="modal" style="display:none;"><div class="modal-content chart-modal-content"><h2 id="chart-title"></h2><div class="chart-container"><canvas id="progress-chart"></canvas></div><div class="modal-actions"><button id="close-chart-btn">Close</button></div></div></div>
+    <div id="jump-to-modal" class="modal" style="display:none;"><div class="modal-content"><h2>Jump To Exercise</h2><ul id="jump-to-list"></ul><div class="modal-actions"><button id="close-jump-modal-btn">Cancel</button></div></div></div>
     
-    <div id="chart-modal" class="modal" style="display:none;">
-      <div class="modal-content chart-modal-content">
-        <h2 id="chart-title">Exercise Progress</h2>
-        <div class="chart-container">
-            <canvas id="progress-chart"></canvas>
-        </div>
-        <div class="modal-actions">
-          <button id="close-chart-btn">Close</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="jump-to-modal" class="modal" style="display:none;">
-      <div class="modal-content">
-        <h2>Jump To Exercise</h2>
-        <ul id="jump-to-list">
-          <!-- Remaining exercises will be populated here by JS -->
-        </ul>
-        <div class="modal-actions">
-          <button id="close-jump-modal-btn">Cancel</button>
-        </div>
-      </div>
-    </div>
-    
-    <template id="exercise-form-template">
-        <div class="exercise-form-item"><hr><h4>Exercise <span class="exercise-number">1</span></h4><div class="form-group"><label>Exercise Name:</label><input type="text" class="exercise-name-input" required></div><div class="form-group-inline"><div class="form-group"><label>Sets:</label><input type="number" class="exercise-sets-input" min="1" value="3" required></div><div class="form-group"><label>Reps:</label><input type="text" class="exercise-reps-input" placeholder="e.g., 8-12" value="8-12" required></div></div><div class="form-group-inline"><div class="form-group"><label>Rest Between Sets (sec):</label><input type="number" class="exercise-rest-between-sets-input" min="0" value="180" required></div><div class="form-group"><label>Rest After Exercise (sec):</label><input type="number" class="exercise-rest-after-exercise-input" min="0" value="180" required></div></div><div class="form-group"><label>Notes (Optional):</label><textarea class="exercise-notes-input"></textarea></div><button type="button" class="remove-exercise-btn">Remove This Exercise</button></div>
-    </template>
-
     <footer><p>© 2024 Workout App <span id="dev-mode-toggle">(Dev)</span></p></footer>
     <audio id="timer-sound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" preload="auto"></audio>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
