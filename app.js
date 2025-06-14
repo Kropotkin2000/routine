@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function buildHeader() {
         getEl('app-header').innerHTML = `<h1>My Workout Routines</h1><div class="header-nav"><button id="history-btn" class="nav-btn">History</button><button id="home-btn" class="nav-btn" style="display: none;">Routines</button><button id="unit-toggle-btn" class="nav-btn">lbs</button><button id="dark-mode-btn" class="icon-btn">🌙</button><button id="mute-btn" class="icon-btn">🔊</button></div>`;
         
-        // ** FIXED: Attach event listeners after creating the buttons **
         getEl('history-btn').addEventListener('click', () => {
             renderHistoryList();
             showView('history-list-view');
@@ -53,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Theming, Mute, and Units
     function applyDarkMode(isDark) { document.body.classList.toggle('dark-mode', isDark); getEl('dark-mode-btn').textContent = isDark ? '☀️' : '🌙'; localStorage.setItem('darkMode', isDark); if (chartInstance) { const gridColor = getComputedStyle(document.body).getPropertyValue('--chart-grid-color').trim(), textColor = getComputedStyle(document.body).getPropertyValue('--text-color').trim(); chartInstance.options.scales.x.grid.color = gridColor; chartInstance.options.scales.y.grid.color = gridColor; chartInstance.options.scales.x.ticks.color = textColor; chartInstance.options.scales.y.ticks.color = textColor; chartInstance.options.plugins.legend.labels.color = textColor; chartInstance.update(); } }
     
-    // ** NEW: Functions to handle mute and unit toggling **
     function toggleMute() {
         isMuted = !isMuted;
         getEl('mute-btn').textContent = isMuted ? '🔇' : '🔊';
@@ -63,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
         weightUnit = weightUnit === 'lbs' ? 'kg' : 'lbs';
         getEl('unit-toggle-btn').textContent = weightUnit;
         localStorage.setItem('workoutUnit', weightUnit);
-        // If player is active, re-render it to show the correct unit
         if (getEl('workout-player-view').style.display === 'block' && !currentWorkout.isResting) {
             updatePlayerUI();
         }
@@ -90,7 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 routineListUL.appendChild(li);
             });
         }
-        // Attach listeners to dynamically created buttons
         queryAll('#routine-list .start-workout-btn').forEach(b => b.addEventListener('click', e => { currentWorkout.routineToStart = e.target.dataset.id; getEl('warmup-reminder-modal').style.display = 'flex'; }));
         queryAll('#routine-list .edit-routine-btn').forEach(b => b.addEventListener('click', e => prepareRoutineEditor(e.target.dataset.id)));
         queryAll('#routine-list .delete-routine-btn').forEach(b => b.addEventListener('click', e => handleDeleteRoutine(e.target.dataset.id)));
@@ -101,7 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function prepareRoutineEditor(routineId = null) {
         const routine = routines.find(r => r.id === routineId);
         showView('routine-editor-view');
-        getEl('routine-editor-view').innerHTML = `<div class="editor-grid"><div class="editor-panel"><h3>Exercise Library</h3><div id="library-container"></div></div><div class="editor-panel"><h3>Your Routine</h3><form id="routine-form"><input type="hidden" id="editor-routine-id" value="${routineId || ""}"><div class="form-group"><label>Routine Name:</label><input type="text" id="editor-routine-name-input" value="${routine ? routine.name : ""}" required></div><div class="routine-defaults"><h4>Default Settings</h4><div class="form-group-inline"><div class="form-group"><label>Sets:</label><input type="number" id="editor-default-sets" value="3" min="1" required></div><div class="form-group"><label>Reps:</label><input type="text" id="editor-default-reps" value="8-12" required></div></div><div class="form-group-inline"><div class="form-group"><label>Rest (Sets):</label><input type="number" id="editor-default-rest-sets" value="180" min="0" required></div><div class="form-group"><label>Rest (Exer.):</label><input type="number" id="editor-default-rest-exercise" value="180" min="0" required></div></div></div><div id="routine-exercise-list" class="drop-zone"><p class="drop-zone-placeholder">Drag exercises here</p></div><div class="form-actions"><button type="submit">Save Routine</button><button type="button" id="editor-cancel-btn">Cancel</button></div></form></div></div>`;
+        // ** MODIFIED **: Changed placeholder text to be more descriptive
+        getEl('routine-editor-view').innerHTML = `<div class="editor-grid"><div class="editor-panel"><h3>Exercise Library</h3><div id="library-container"></div></div><div class="editor-panel"><h3>Your Routine</h3><form id="routine-form"><input type="hidden" id="editor-routine-id" value="${routineId || ""}"><div class="form-group"><label>Routine Name:</label><input type="text" id="editor-routine-name-input" value="${routine ? routine.name : ""}" required></div><div class="routine-defaults"><h4>Default Settings</h4><div class="form-group-inline"><div class="form-group"><label>Sets:</label><input type="number" id="editor-default-sets" value="3" min="1" required></div><div class="form-group"><label>Reps:</label><input type="text" id="editor-default-reps" value="8-12" required></div></div><div class="form-group-inline"><div class="form-group"><label>Rest (Sets):</label><input type="number" id="editor-default-rest-sets" value="180" min="0" required></div><div class="form-group"><label>Rest (Exer.):</label><input type="number" id="editor-default-rest-exercise" value="180" min="0" required></div></div></div><div id="routine-exercise-list" class="drop-zone"><p class="drop-zone-placeholder">Tap library items or drag them here</p></div><div class="form-actions"><button type="submit">Save Routine</button><button type="button" id="editor-cancel-btn">Cancel</button></div></form></div></div>`;
         
         buildLibrary();
         
@@ -123,7 +120,21 @@ document.addEventListener('DOMContentLoaded', () => {
         getEl('routine-form').addEventListener('submit', handleSaveRoutine);
         getEl('editor-cancel-btn').addEventListener('click', () => showView('routine-list-view'));
     }
-    function buildLibrary(){const container=getEl('library-container');container.innerHTML='';for(const category in masterExerciseList){const details=document.createElement('details');details.className='library-category';const summary=document.createElement('summary');summary.textContent=category;const list=document.createElement('div');list.className='library-list';masterExerciseList[category].forEach(exName=>{const item=document.createElement('div');item.className='library-item';item.textContent=exName;list.appendChild(item);});details.appendChild(summary);details.appendChild(list);container.appendChild(details);}}
+    // ** NEW **: Handler for the "tap-to-add" functionality
+    function handleLibraryItemClick(e) {
+        const exerciseName = e.currentTarget.textContent;
+        const routineListEl = getEl('routine-exercise-list');
+        const newItem = createRoutineExerciseItem(exerciseName);
+        routineListEl.appendChild(newItem);
+        
+        // Hide the placeholder text
+        const placeholder = routineListEl.querySelector('.drop-zone-placeholder');
+        if (placeholder) {
+            placeholder.style.display = 'none';
+        }
+    }
+    // ** MODIFIED **: Added a click listener to each library item
+    function buildLibrary(){const container=getEl('library-container');container.innerHTML='';for(const category in masterExerciseList){const details=document.createElement('details');details.className='library-category';const summary=document.createElement('summary');summary.textContent=category;const list=document.createElement('div');list.className='library-list';masterExerciseList[category].forEach(exName=>{const item=document.createElement('div');item.className='library-item';item.textContent=exName;item.addEventListener('click', handleLibraryItemClick); list.appendChild(item);});details.appendChild(summary);details.appendChild(list);container.appendChild(details);}}
     function createRoutineExerciseItem(name){const item=document.createElement('div');item.className='routine-exercise-item';item.textContent=name;const removeBtn=document.createElement('button');removeBtn.type='button';removeBtn.className='remove-exercise-btn';removeBtn.innerHTML='×';removeBtn.addEventListener('click',()=>item.remove());item.appendChild(removeBtn);return item;}
     function handleSaveRoutine(e){
         e.preventDefault();
@@ -154,16 +165,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- Event Listeners for Static Elements ---
     function initializeAppListeners() {
-        // ** FIXED: Moved listener for static button here from renderRoutineList **
         getEl('create-new-routine-btn').addEventListener('click', () => prepareRoutineEditor());
         
-        // Modal listeners
         getEl('close-chart-btn').addEventListener('click', () => getEl('chart-modal').style.display = 'none');
         getEl('jump-to-modal').querySelector('#close-jump-modal-btn').addEventListener('click', () => getEl('jump-to-modal').style.display = 'none');
         getEl('warmup-reminder-modal').querySelector('#confirm-warmup-done-btn').addEventListener('click', () => { getEl('warmup-reminder-modal').style.display = 'none'; if (currentWorkout.routineToStart) startWorkout(currentWorkout.routineToStart); });
         getEl('warmup-reminder-modal').querySelector('#cancel-start-workout-btn').addEventListener('click', () => { getEl('warmup-reminder-modal').style.display = 'none'; currentWorkout.routineToStart = null; });
         
-        // Dev Panel listener
         initializeDevMode();
     }
     
@@ -171,7 +179,6 @@ document.addEventListener('DOMContentLoaded', () => {
     buildHeader();
     initializeAppListeners();
 
-    // ** FIXED: Load user preferences from localStorage on startup **
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     applyDarkMode(savedDarkMode);
 
