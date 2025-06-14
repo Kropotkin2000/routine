@@ -540,3 +540,16 @@ footer {
         grid-template-columns: 1fr 1.5fr;
     }
 }
+/* ADD THIS TO THE END OF YOUR style.css FILE */
+
+.library-item.is-added {
+    opacity: 0.5;
+    background-color: var(--list-item-hover-bg-color);
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+.library-item.is-added:hover {
+    /* Prevents hover effect on added items */
+    background-color: var(--list-item-hover-bg-color);
+}
